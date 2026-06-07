@@ -1,0 +1,49 @@
+# Render Blueprint for the Seva ERP backend.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Deploy: this file lives at the root of the seva_backend repo. In Render ->
+# "New +" -> "Blueprint", point it at this repo; Render reads this file and
+# provisions the service.
+#
+# NOTE: uploads use the container's ephemeral filesystem for now and are LOST on
+# every redeploy/restart. Migrate multer to S3/Cloudinary before relying on them.
+
+services:
+  - type: web
+    name: seva-erp-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: singapore           # closest Render region to India; change if needed
+    plan: free                  # bump to "starter" for no cold-starts / more RAM
+    healthCheckPath: /api/v1/health
+    autoDeploy: true            # redeploy on every push to the connected branch
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # --- Secrets you MUST enter in the Render dashboard (sync:false) ---
+      - key: MONGODB_URI
+        sync: false             # paste your MongoDB Atlas connection string
+      - key: CORS_ORIGIN
+        sync: false             # e.g. https://your-frontend.onrender.com (comma-separate for multiple)
+
+      # --- Secrets Render auto-generates (secure random, satisfies min-length) ---
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: PIN_PEPPER
+        generateValue: true
+
+      # --- Plain config ---
+      - key: JWT_ACCESS_EXPIRES
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES
+        value: 7d
+      - key: MAX_UPLOAD_MB
+        value: "5"
+
+      # PORT is injected by Render automatically — do NOT set it here.
+      # UPLOAD_DIR defaults to /app/uploads in the Dockerfile (ephemeral) — fine for now.
