@@ -1,0 +1,20 @@
+node_modules
+dist
+coverage
+.nyc_output
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Runtime / generated
+uploads
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode
+.idea

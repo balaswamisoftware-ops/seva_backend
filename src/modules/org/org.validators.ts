@@ -1,0 +1,36 @@
+import { z } from 'zod';
+
+export const updateOrgSchema = z.object({
+  orgName:         z.string().min(1).max(120).optional(),
+  address:         z.string().max(500).optional(),
+  contactNumber:   z.string().max(20).optional(),
+  email:           z.string().email().optional().or(z.literal('')),
+  gstNumber:       z.string().max(30).optional(),
+  logoUrl:         z.string().optional(),
+  receiptHeader:   z.string().max(500).optional(),
+  receiptFooter:   z.string().max(500).optional(),
+  spiritualQuote:  z.string().max(200).optional(),
+  thankYouMessage: z.string().max(200).optional(),
+  printerWidth:    z.coerce.number().refine((v) => v === 58 || v === 80, 'Must be 58 or 80').optional(),
+  fontSize:        z.enum(['small', 'normal', 'large']).optional(),
+  textAlignment:   z.enum(['left', 'center', 'right']).optional(),
+  printLogo:       z.coerce.boolean().optional(),
+  printQrCode:     z.coerce.boolean().optional(),
+  lineSpacing:     z.coerce.number().int().min(1).max(3).optional(),
+
+  // A4 donation receipt formatting
+  a4Title:             z.string().max(80).optional(),
+  a4TitleAlignment:    z.enum(['left', 'center', 'right']).optional(),
+  a4OrgNameAlignment:  z.enum(['left', 'center']).optional(),
+  a4AccentColor:       z.string().regex(/^#?[0-9a-fA-F]{6}$/, 'Must be a 6-digit hex color').optional(),
+  a4FontSize:          z.enum(['small', 'normal', 'large']).optional(),
+  a4BoldHeaders:       z.coerce.boolean().optional(),
+  a4BoldAmount:        z.coerce.boolean().optional(),
+  a4ShowLogo:          z.coerce.boolean().optional(),
+  a4ShowAmountInWords: z.coerce.boolean().optional(),
+  a4ShowSignatureLine: z.coerce.boolean().optional(),
+  a4SignatureLabel:    z.string().max(80).optional(),
+  a4Show80GTagline:    z.coerce.boolean().optional(),
+  a4Header:            z.string().max(500).optional(),
+  a4Footer:            z.string().max(1000).optional(),
+});
