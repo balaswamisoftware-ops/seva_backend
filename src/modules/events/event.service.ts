@@ -1,10 +1,13 @@
+import { Request } from 'express';
 import { Event } from './event.model';
 import { Seva } from '../sevas/seva.model';
 import { nextEventCode, nextSevaCode } from '../../utils/counters';
 import { NotFound, BadRequest } from '../../utils/errors';
 import { EventStatus } from '../../utils/constants';
+import { recordAudit } from '../audit/audit.service';
 
-export async function createEvent(input: any, createdBy?: string) {
+export async function createEvent(input: any, req: Request) {
+  const createdBy = req.user?.id;
   const { sevas: inlineSevas = [], ...eventInput } = input;
   const eventId = await nextEventCode();
   const ev = await Event.create({ ...eventInput, eventId, createdBy });
@@ -20,20 +23,46 @@ export async function createEvent(input: any, createdBy?: string) {
     await Seva.insertMany(rows);
   }
 
-  return ev.toJSON();
+  const json = ev.toJSON();
+  await recordAudit(req, {
+    action: 'CREATE', entityType: 'Event',
+    entityId: String(ev._id), entityCode: ev.eventId,
+    before: null, after: json,
+  });
+  return json;
 }
 
-export async function updateEvent(id: string, input: any, updatedBy?: string) {
-  const ev = await Event.findByIdAndUpdate(id, { ...input, updatedBy }, { new: true });
-  if (!ev) throw NotFound('Event not found');
-  return ev.toJSON();
+export async function updateEvent(id: string, input: any, req: Request) {
+  const current = await Event.findById(id);
+  if (!current) throw NotFound('Event not found');
+  const before = current.toJSON();
+
+  Object.assign(current, input, { updatedBy: req.user?.id });
+  await current.save();
+  const after = current.toJSON();
+
+  await recordAudit(req, {
+    action: 'UPDATE', entityType: 'Event',
+    entityId: String(current._id), entityCode: current.eventId,
+    before, after,
+  });
+  return after;
 }
 
-export async function deleteEvent(id: string) {
+export async function deleteEvent(id: string, req: Request) {
   const seva = await Seva.findOne({ eventId: id });
   if (seva) throw BadRequest('Cannot delete event with sevas attached. Delete sevas first or mark event CANCELLED.');
-  const ev = await Event.findByIdAndDelete(id);
+  const ev = await Event.findById(id);
   if (!ev) throw NotFound('Event not found');
+  const before = ev.toJSON();
+
+  await ev.deleteOne();
+
+  await recordAudit(req, {
+    action: 'DELETE', entityType: 'Event',
+    entityId: String(ev._id), entityCode: ev.eventId,
+    before, after: null,
+  });
   return { success: true };
 }
 

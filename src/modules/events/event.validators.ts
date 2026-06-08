@@ -19,6 +19,7 @@ export const createEventSchema = z.object({
   location:    z.string().max(200).optional(),
   bannerImage: z.string().url().optional().or(z.literal('').transform(() => undefined)),
   status:      z.enum(EVENT_STATUSES).optional(),
+  collectDevoteeDetails: z.coerce.boolean().optional(),
   sevas:       z.array(inlineSevaSchema).optional(),
 }).refine((d) => d.endDate >= d.startDate, { message: 'endDate must be >= startDate', path: ['endDate'] });
 
@@ -30,6 +31,7 @@ export const updateEventSchema = z.object({
   location:    z.string().max(200).optional(),
   bannerImage: z.string().url().optional().or(z.literal('').transform(() => undefined)),
   status:      z.enum(EVENT_STATUSES).optional(),
+  collectDevoteeDetails: z.coerce.boolean().optional(),
 });
 
 export const listQuerySchema = z.object({

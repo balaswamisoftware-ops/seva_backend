@@ -11,6 +11,9 @@ import donationRoutes from '../modules/donations/donation.routes';
 import donationPurposeRoutes from '../modules/donationPurposes/donationPurpose.routes';
 import syncRoutes from '../modules/sync/sync.routes';
 import printerRoutes from '../modules/printers/printer.routes';
+import devoteeRoutes from '../modules/devotees/devotee.routes';
+import participationRoutes from '../modules/participations/participation.routes';
+import auditRoutes from '../modules/audit/audit.routes';
 
 const router = Router();
 
@@ -28,5 +31,8 @@ router.use('/donations',  donationRoutes);
 router.use('/donation-purposes', donationPurposeRoutes);
 router.use('/sync',       syncRoutes);
 router.use('/printers',   printerRoutes);
+router.use('/devotees',   devoteeRoutes);
+router.use('/participations', participationRoutes);
+router.use('/audit',      auditRoutes);
 
 export default router;

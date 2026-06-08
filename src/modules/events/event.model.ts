@@ -11,6 +11,9 @@ const eventSchema = new Schema(
     location:    { type: String },
     bannerImage: { type: String },
     status:      { type: String, enum: EVENT_STATUSES, default: 'UPCOMING', index: true },
+    // When true, event participation requires a phone number and collects
+    // devotee details (full name / gothram / nakshatram optional).
+    collectDevoteeDetails: { type: Boolean, default: false },
     createdBy:   { type: Types.ObjectId, ref: 'Employee' },
     updatedBy:   { type: Types.ObjectId, ref: 'Employee' },
   },

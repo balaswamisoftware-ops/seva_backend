@@ -32,6 +32,10 @@ export async function nextEmployeeCode(session?: ClientSession) {
   const n = await nextSequence('EMP', session);
   return `EMP${String(n).padStart(3, '0')}`;
 }
+export async function nextDevoteeCode(session?: ClientSession) {
+  const n = await nextSequence('DEV', session);
+  return `DEV${String(n).padStart(4, '0')}`;
+}
 export async function nextEventCode(session?: ClientSession) {
   const n = await nextSequence('EVT', session);
   return `EVT${String(n).padStart(4, '0')}`;

@@ -28,3 +28,12 @@ export const ACTIVITY_ACTIONS = {
   RECEIPT_PRINTED: 'RECEIPT_PRINTED',
   ORG_SETTINGS_UPDATED: 'ORG_SETTINGS_UPDATED',
 } as const;
+
+// ---- Audit (before/after + rollback) -------------------------------------
+// CREATE/UPDATE/DELETE are the canonical audited actions; ROLLBACK records the
+// undo of a prior audit entry. entityType is one of AUDIT_ENTITIES.
+export const AUDIT_ACTIONS = ['CREATE', 'UPDATE', 'DELETE', 'ROLLBACK'] as const;
+export type AuditAction = (typeof AUDIT_ACTIONS)[number];
+
+export const AUDIT_ENTITIES = ['Devotee', 'Event', 'EventParticipation'] as const;
+export type AuditEntity = (typeof AUDIT_ENTITIES)[number];
